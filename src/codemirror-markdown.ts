@@ -11,7 +11,7 @@ import {
   drawSelection,
   highlightActiveLine,
 } from '@codemirror/view';
-import { EditorState, Annotation } from '@codemirror/state';
+import { SelectionRange, EditorState, Annotation } from '@codemirror/state';
 import { markdown } from '@codemirror/lang-markdown';
 
 import { foldGutter, foldKeymap } from '@codemirror/fold';
@@ -63,13 +63,33 @@ export class CodemirrorMarkdown extends ScopedElementsMixin(LitElement) {
         }
 
         update(update: ViewUpdate) {
+          console.log(update);
+
           if (
-            !update.docChanged ||
-            (update.transactions.length > 0 &&
-              update.transactions[0].annotation(DummyAnnotation))
+            update.transactions.length > 0 &&
+            update.transactions[0].annotation(DummyAnnotation)
           ) {
             return;
           }
+
+          if (update.selectionSet) {
+            const rangesDeep: SelectionRange[][] = update.transactions
+              .map(t => t.selection?.ranges)
+              .filter(t => t) as SelectionRange[][];
+            const ranges: SelectionRange[] = ([] as SelectionRange[]).concat(
+              ...rangesDeep
+            );
+
+            thisEl.dispatchEvent(
+              new CustomEvent('selection-changed', {
+                bubbles: true,
+                composed: true,
+                detail: { ranges },
+              })
+            );
+          }
+
+          if (!update.docChanged) return;
 
           let adj = 0;
           update.changes.iterChanges((fromA, toA, fromB, toB, insert) => {

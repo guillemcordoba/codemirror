@@ -17,7 +17,7 @@ export class RemoteCursor extends ScopedElementsMixin(LitElement) {
   firstUpdated() {
     setInterval(() => {
       this._showCursor = !this._showCursor;
-    }, 500);
+    }, 600);
   }
 
   renderCursor() {
@@ -48,7 +48,7 @@ export class RemoteCursor extends ScopedElementsMixin(LitElement) {
 
   static styles = css`
     .cursor {
-      width: 2px;
+      width: 1px;
       height: 18px;
       margin-left: -1;
     }
