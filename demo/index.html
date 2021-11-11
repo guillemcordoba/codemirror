@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en-GB">
+  <head>
+    <meta charset="utf-8" />
+    <style>
+      body {
+        background: #fafafa;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="demo"></div>
+
+    <script type="module">
+      import { html, render } from 'lit';
+      import { CodemirrorMarkdown } from '../dist';
+
+      customElements.define('codemirror-markdown', CodemirrorMarkdown);
+
+      let title = 'Hello owc World!';
+      render(
+        html`
+          <codemirror-markdown
+            .text=${title}
+            id="editor"
+            @text-inserted=${e => {
+              console.log(e);
+              title =
+                title.slice(0, e.detail.from) +
+                e.detail.text +
+                title.slice(e.detail.from);
+              document.getElementById('editor').text = title;
+            }}
+            .additionalCursors=${[
+              { name: 'alex', position: 6, color: '100 100 100' },
+            ]}
+          >
+          </codemirror-markdown>
+        `,
+        document.querySelector('#demo')
+      );
+    </script>
+  </body>
+</html>
