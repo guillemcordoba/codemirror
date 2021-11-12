@@ -1,5 +1,5 @@
 import { css, html, LitElement } from 'lit';
-import { property, state } from 'lit/decorators.js';
+import { property } from 'lit/decorators.js';
 import { styleMap } from 'lit/directives/style-map.js';
 import { SlTooltip } from '@scoped-elements/shoelace';
 import { ScopedElementsMixin } from '@open-wc/scoped-elements';
@@ -11,21 +11,11 @@ export class RemoteCursor extends ScopedElementsMixin(LitElement) {
   @property()
   color!: string;
 
-  @state()
-  _showCursor = true;
-
-  firstUpdated() {
-    setInterval(() => {
-      this._showCursor = !this._showCursor;
-    }, 600);
-  }
-
   renderCursor() {
     return html`<div
       class="cursor"
       style=${styleMap({
         'background-color': `rgb(${this.color})`,
-        opacity: this._showCursor ? '1' : '0',
       })}
     ></div>`;
   }
@@ -37,6 +27,7 @@ export class RemoteCursor extends ScopedElementsMixin(LitElement) {
             <sl-tooltip
               style=${styleMap({ '--sl-tooltip-background-color': this.color })}
               .open=${true}
+              placement="top"
               .content=${this.name}
             >
               ${this.renderCursor()}
@@ -54,7 +45,7 @@ export class RemoteCursor extends ScopedElementsMixin(LitElement) {
     }
   `;
 
-  static get scopedElements() {
+  static get scopedElements(): { [key: string]: typeof HTMLElement } {
     return {
       'sl-tooltip': SlTooltip,
     };

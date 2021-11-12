@@ -1,48 +1,53 @@
-# \<code-mirror>
+# @scoped-elements/codemirror
 
-This webcomponent follows the [open-wc](https://github.com/open-wc/open-wc) recommendation.
+This is a wrapper of [codemirror](https://codemirror.net/6/) packaged using the scoped custom elements registries pattern using [@open-wc/scoped-elements](https://www.npmjs.com/package/@open-wc/scoped-elements).
 
 ## Installation
 
 ```bash
-npm i code-mirror
+npm i @scoped-elements/codemirror
 ```
 
 ## Usage
 
-```html
-<script type="module">
-  import 'code-mirror/code-mirror.js';
-</script>
+### As an sub element in your own custom element
 
-<code-mirror></code-mirror>
+```js
+import { CodemirrorMarkdown } from '@scoped-elements/codemirror';
+import { ScopedElementsMixin } from '@open-wc/scoped-elements';
+
+export class CustomElement extends ScopedElementsMixin(LitElement) {
+  static get scopedElements() {
+    return {
+      'codemirror-markdown': CodemirrorMarkdown,
+    };
+  }
+
+  render() {
+    return html`
+      <codemirror-markdown
+        text="example text"
+        @text-inserted=${e => {
+          console.log(e);
+        }}
+      ></codemirror-markdown>
+    `;
+  }
+}
 ```
 
-## Linting and formatting
+### As a globally defined custom element
 
-To scan the project for linting and formatting errors, run
+```js
+import { CodemirrorMarkdown } from '@scoped-elements/codemirror';
 
-```bash
-npm run lint
+customElements.define('codemirror-markdown', CodemirrorMarkdown);
 ```
 
-To automatically fix linting and formatting errors, run
+## Documentation for the elements
 
-```bash
-npm run format
-```
+As this package is just a re-export, you can find the documentation for codemirror [here](https://codemirror.net/6/).
 
+## Appreciation
 
-## Tooling configs
-
-For most of the tools, the configuration is in the `package.json` to reduce the amount of files in your project.
-
-If you customize the configuration a lot, you can consider moving them to individual files.
-
-## Local Demo with `web-dev-server`
-
-```bash
-npm start
-```
-
-To run a local development server that serves the basic demo located in `demo/index.html`
+This library is just a re-export, all the credit goes to [codemirror](https://codemirror.net/6/) and its authors. Thanks!

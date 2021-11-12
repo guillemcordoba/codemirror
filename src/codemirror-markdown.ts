@@ -25,7 +25,10 @@ import { autocompletion, completionKeymap } from '@codemirror/autocomplete';
 import { rectangularSelection } from '@codemirror/rectangular-selection';
 import { defaultHighlightStyle } from '@codemirror/highlight';
 import { lintKeymap } from '@codemirror/lint';
+import { oneDarkTheme } from '@codemirror/theme-one-dark';
+
 import { ScopedElementsMixin } from '@open-wc/scoped-elements';
+
 import { RemoteCursor } from './remote-cursor';
 
 const DummyAnnotation = Annotation.define();
@@ -63,8 +66,6 @@ export class CodemirrorMarkdown extends ScopedElementsMixin(LitElement) {
         }
 
         update(update: ViewUpdate) {
-          console.log(update);
-
           if (
             update.transactions.length > 0 &&
             update.transactions[0].annotation(DummyAnnotation)
@@ -96,13 +97,13 @@ export class CodemirrorMarkdown extends ScopedElementsMixin(LitElement) {
             const insertText = insert.sliceString(0, insert.length, '\n');
             if (fromA !== toA) {
               const from = fromA + adj;
-              const to = toA - fromA;
+              const characterCount = toA - fromA;
               setTimeout(() => {
                 thisEl.dispatchEvent(
                   new CustomEvent('text-deleted', {
                     detail: {
                       from,
-                      to,
+                      characterCount,
                     },
                     bubbles: true,
                     composed: true,
@@ -134,6 +135,7 @@ export class CodemirrorMarkdown extends ScopedElementsMixin(LitElement) {
     this.editor = new EditorView({
       state: EditorState.create({
         extensions: [
+          EditorView.lineWrapping,
           lineNumbers(),
           highlightActiveLineGutter(),
           highlightSpecialChars(),
@@ -157,6 +159,7 @@ export class CodemirrorMarkdown extends ScopedElementsMixin(LitElement) {
             ...lintKeymap,
           ]),
           markdown(),
+          oneDarkTheme,
           plugin,
         ],
       }),
@@ -170,6 +173,11 @@ export class CodemirrorMarkdown extends ScopedElementsMixin(LitElement) {
 
   setText(t: string) {
     const { selection } = this.editor.state;
+
+    const textLength = t.length;
+    const anchor =
+      selection.main.anchor > textLength ? textLength : selection.main.anchor;
+
     this.editor.dispatch({
       annotations: [DummyAnnotation.of([])],
       changes: [
@@ -180,31 +188,36 @@ export class CodemirrorMarkdown extends ScopedElementsMixin(LitElement) {
         },
       ],
       selection: {
-        anchor: selection.main.anchor,
+        anchor,
       },
     });
+
+    this.editor.scrollPosIntoView(anchor);
   }
 
-  renderCursors() {
+  renderCursor(c: { position: number; name: string; color: string }) {
     if (!this.editor) return html``;
 
-    return this.additionalCursors.map(
-      c =>
-        html`<remote-cursor
-          style=${styleMap({
-            left: `${this.editor.coordsAtPos(c.position)?.left}px`,
-            top: `${this.editor.coordsAtPos(c.position)?.top}px`,
-          })}
-          class="cursor"
-          .name=${c.name}
-          .color=${c.color}
-        ></remote-cursor>`
-    );
+    if (this.editor.state.doc.length < c.position) return html``;
+
+    const coords = this.editor.coordsAtPos(c.position);
+
+    if (!coords) return html``;
+
+    return html`<remote-cursor
+      style=${styleMap({
+        left: `${coords.left}px`,
+        top: `${coords.top}px`,
+      })}
+      class="cursor"
+      .name=${c.name}
+      .color=${c.color}
+    ></remote-cursor>`;
   }
 
   render() {
     return html`<div style="flex: 1;" id="editor"></div>
-      ${this.renderCursors()} `;
+      ${this.additionalCursors.map(c => this.renderCursor(c))} `;
   }
 
   static styles = css`

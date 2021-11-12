@@ -1,9 +1,9 @@
 {
   "name": "@scoped-elements/codemirror",
-  "description": "Webcomponent code-mirror following open-wc recommendations",
+  "description": "Wrapper of codemirror using the @open-wc/scoped-elements pattern",
   "license": "MIT",
-  "author": "code-mirror",
-  "version": "0.0.0",
+  "author": "guillem.cordoba@gmail.com",
+  "version": "0.0.1",
   "main": "dist/index.js",
   "module": "dist/index.js",
   "exports": {
@@ -32,9 +32,10 @@
     "@codemirror/rectangular-selection": "^0.19.1",
     "@codemirror/search": "^0.19.2",
     "@codemirror/state": "^0.19.5",
+    "@codemirror/theme-one-dark": "^0.19.1",
     "@codemirror/view": "^0.19.15",
     "@open-wc/scoped-elements": "^2.0.1",
-    "@scoped-elements/shoelace": "^0.0.7",
+    "@scoped-elements/shoelace": "0.0.8",
     "lit": "^2.0.2"
   },
   "devDependencies": {
