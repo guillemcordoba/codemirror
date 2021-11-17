@@ -27,6 +27,7 @@ export class RemoteCursor extends ScopedElementsMixin(LitElement) {
             <sl-tooltip
               style=${styleMap({ '--sl-tooltip-background-color': this.color })}
               .open=${true}
+              trigger="manual"
               placement="top"
               .content=${this.name}
             >

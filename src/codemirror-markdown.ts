@@ -11,7 +11,12 @@ import {
   drawSelection,
   highlightActiveLine,
 } from '@codemirror/view';
-import { SelectionRange, EditorState, Annotation } from '@codemirror/state';
+import {
+  SelectionRange,
+  EditorState,
+  Annotation,
+  TransactionSpec,
+} from '@codemirror/state';
 import { markdown } from '@codemirror/lang-markdown';
 
 import { foldGutter, foldKeymap } from '@codemirror/fold';
@@ -33,26 +38,31 @@ import { RemoteCursor } from './remote-cursor';
 
 const DummyAnnotation = Annotation.define();
 
+export interface CodemirrorState {
+  text: string;
+  cursor: number;
+}
+
 export class CodemirrorMarkdown extends ScopedElementsMixin(LitElement) {
   editor!: EditorView;
 
   @query('#editor')
   _editorEl!: HTMLElement;
 
+  _state: CodemirrorState | undefined;
+
   @property()
-  set text(t: string) {
+  set state(s: CodemirrorState) {
     if (this.editor) {
-      this.setText(t);
+      this.setState(s);
     } else {
-      this._text = t;
+      this._state = s;
     }
   }
 
   @property()
   additionalCursors: Array<{ name: string; position: number; color: string }> =
     [];
-
-  _text: string | undefined;
 
   firstUpdated() {
     const thisEl = this;
@@ -73,7 +83,7 @@ export class CodemirrorMarkdown extends ScopedElementsMixin(LitElement) {
             return;
           }
 
-          if (update.selectionSet) {
+          if (update.selectionSet && !update.docChanged) {
             const rangesDeep: SelectionRange[][] = update.transactions
               .map(t => t.selection?.ranges)
               .filter(t => t) as SelectionRange[][];
@@ -81,13 +91,15 @@ export class CodemirrorMarkdown extends ScopedElementsMixin(LitElement) {
               ...rangesDeep
             );
 
-            thisEl.dispatchEvent(
-              new CustomEvent('selection-changed', {
-                bubbles: true,
-                composed: true,
-                detail: { ranges },
-              })
-            );
+            setTimeout(() => {
+              thisEl.dispatchEvent(
+                new CustomEvent('selection-changed', {
+                  bubbles: true,
+                  composed: true,
+                  detail: { ranges },
+                })
+              );
+            });
           }
 
           if (!update.docChanged) return;
@@ -165,34 +177,40 @@ export class CodemirrorMarkdown extends ScopedElementsMixin(LitElement) {
       }),
       parent: this._editorEl as Element,
     });
-    if (this._text) {
-      this.setText(this._text);
+    if (this._state) {
+      this.setState(this._state);
     }
     this.requestUpdate();
   }
 
-  setText(t: string) {
-    const { selection } = this.editor.state;
-
-    const textLength = t.length;
-    const anchor =
-      selection.main.anchor > textLength ? textLength : selection.main.anchor;
-
-    this.editor.dispatch({
+  setState(state: CodemirrorState) {
+    const transaction: any = {
       annotations: [DummyAnnotation.of([])],
-      changes: [
+    };
+    const documentLength = this.editor.state.doc.length;
+    if (state.text) {
+      transaction.changes = [
         {
           from: 0,
-          to: this.editor.state.doc.length,
-          insert: t,
+          to: documentLength,
+          insert: state.text,
         },
-      ],
-      selection: {
-        anchor,
-      },
-    });
+      ];
+    }
+    if (state.cursor) {
+      transaction.selection = {
+        anchor: state.cursor < documentLength ? state.cursor : documentLength,
+      };
+    }
 
-    this.editor.scrollPosIntoView(anchor);
+    this.editor.dispatch(transaction);
+  }
+
+  dispatchChanges(changes: TransactionSpec) {
+    this.editor.dispatch({
+      annotations: [DummyAnnotation.of([])],
+      ...changes,
+    });
   }
 
   renderCursor(c: { position: number; name: string; color: string }) {
