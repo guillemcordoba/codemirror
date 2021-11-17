@@ -40,7 +40,7 @@ const DummyAnnotation = Annotation.define();
 
 export interface CodemirrorState {
   text: string;
-  cursor: number;
+  selection?: SelectionRange;
 }
 
 export class CodemirrorMarkdown extends ScopedElementsMixin(LitElement) {
@@ -184,7 +184,7 @@ export class CodemirrorMarkdown extends ScopedElementsMixin(LitElement) {
   }
 
   setState(state: CodemirrorState) {
-    const transaction: any = {
+    const transaction: TransactionSpec = {
       annotations: [DummyAnnotation.of([])],
     };
     const documentLength = this.editor.state.doc.length;
@@ -197,9 +197,10 @@ export class CodemirrorMarkdown extends ScopedElementsMixin(LitElement) {
         },
       ];
     }
-    if (state.cursor) {
+    if (state.selection) {
       transaction.selection = {
-        anchor: state.cursor < documentLength ? state.cursor : documentLength,
+        anchor: state.selection.from,
+        head: state.selection.to,
       };
     }
 
