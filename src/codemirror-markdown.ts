@@ -188,15 +188,13 @@ export class CodemirrorMarkdown extends ScopedElementsMixin(LitElement) {
       annotations: [DummyAnnotation.of([])],
     };
     const documentLength = this.editor.state.doc.length;
-    if (state.text) {
-      transaction.changes = [
-        {
-          from: 0,
-          to: documentLength,
-          insert: state.text,
-        },
-      ];
-    }
+    transaction.changes = [
+      {
+        from: 0,
+        to: documentLength,
+        insert: state.text,
+      },
+    ];
     if (state.selection) {
       transaction.selection = {
         anchor: state.selection.from,
