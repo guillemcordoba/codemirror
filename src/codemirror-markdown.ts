@@ -32,6 +32,7 @@ import { defaultHighlightStyle } from '@codemirror/highlight';
 import { lintKeymap } from '@codemirror/lint';
 import { oneDarkTheme } from '@codemirror/theme-one-dark';
 
+import isEqual from 'lodash-es/isEqual';
 import { ScopedElementsMixin } from '@open-wc/scoped-elements';
 
 import { RemoteCursor } from './remote-cursor';
@@ -53,11 +54,10 @@ export class CodemirrorMarkdown extends ScopedElementsMixin(LitElement) {
 
   @property()
   set state(s: CodemirrorState) {
-    if (this.editor) {
+    if (this.editor && !isEqual(this._state, s)) {
       this.setState(s);
-    } else {
-      this._state = s;
     }
+    this._state = s;
   }
 
   @property()
@@ -91,15 +91,13 @@ export class CodemirrorMarkdown extends ScopedElementsMixin(LitElement) {
               ...rangesDeep
             );
 
-            setTimeout(() => {
-              thisEl.dispatchEvent(
-                new CustomEvent('selection-changed', {
-                  bubbles: true,
-                  composed: true,
-                  detail: { ranges },
-                })
-              );
-            });
+            thisEl.dispatchEvent(
+              new CustomEvent('selection-changed', {
+                bubbles: true,
+                composed: true,
+                detail: { ranges },
+              })
+            );
           }
 
           if (!update.docChanged) return;
@@ -110,33 +108,30 @@ export class CodemirrorMarkdown extends ScopedElementsMixin(LitElement) {
             if (fromA !== toA) {
               const from = fromA + adj;
               const characterCount = toA - fromA;
-              setTimeout(() => {
-                thisEl.dispatchEvent(
-                  new CustomEvent('text-deleted', {
-                    detail: {
-                      from,
-                      characterCount,
-                    },
-                    bubbles: true,
-                    composed: true,
-                  })
-                );
-              });
+              thisEl.dispatchEvent(
+                new CustomEvent('text-deleted', {
+                  detail: {
+                    from,
+                    characterCount,
+                  },
+                  bubbles: true,
+                  composed: true,
+                })
+              );
             }
             if (insertText.length > 0) {
               const from = fromA + adj;
-              setTimeout(() => {
-                thisEl.dispatchEvent(
-                  new CustomEvent('text-inserted', {
-                    detail: {
-                      from,
-                      text: insertText,
-                    },
-                    bubbles: true,
-                    composed: true,
-                  })
-                );
-              });
+
+              thisEl.dispatchEvent(
+                new CustomEvent('text-inserted', {
+                  detail: {
+                    from,
+                    text: insertText,
+                  },
+                  bubbles: true,
+                  composed: true,
+                })
+              );
             }
             adj += insertText.length - (toA - fromA);
           });
