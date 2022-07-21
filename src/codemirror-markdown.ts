@@ -108,11 +108,15 @@ export class CodemirrorMarkdown extends ScopedElementsMixin(LitElement) {
             if (fromA !== toA) {
               const from = fromA + adj;
               const characterCount = toA - fromA;
+
+              const coords = thisEl.editor.coordsAtPos(from);
+
               thisEl.dispatchEvent(
                 new CustomEvent('text-deleted', {
                   detail: {
                     from,
                     characterCount,
+                    coords,
                   },
                   bubbles: true,
                   composed: true,
@@ -122,11 +126,15 @@ export class CodemirrorMarkdown extends ScopedElementsMixin(LitElement) {
             if (insertText.length > 0) {
               const from = fromA + adj;
 
+              const coords = thisEl.editor.coordsAtPos(
+                from + insertText.length
+              );
               thisEl.dispatchEvent(
                 new CustomEvent('text-inserted', {
                   detail: {
                     from,
                     text: insertText,
+                    coords,
                   },
                   bubbles: true,
                   composed: true,
