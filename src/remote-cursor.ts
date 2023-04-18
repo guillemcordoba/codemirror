@@ -1,10 +1,11 @@
 import { css, html, LitElement } from 'lit';
-import { property } from 'lit/decorators.js';
+import { customElement, property } from 'lit/decorators.js';
 import { styleMap } from 'lit/directives/style-map.js';
-import { SlTooltip } from '@scoped-elements/shoelace';
-import { ScopedElementsMixin } from '@open-wc/scoped-elements';
 
-export class RemoteCursor extends ScopedElementsMixin(LitElement) {
+import '@shoelace-style/shoelace/dist/components/tooltip/tooltip.js';
+
+@customElement('codemirror-remote-cursor')
+export class RemoteCursor extends LitElement {
   @property()
   name!: string;
 
@@ -45,10 +46,4 @@ export class RemoteCursor extends ScopedElementsMixin(LitElement) {
       margin-left: -1;
     }
   `;
-
-  static get scopedElements(): { [key: string]: typeof HTMLElement } {
-    return {
-      'sl-tooltip': SlTooltip,
-    };
-  }
 }

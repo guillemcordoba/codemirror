@@ -1,5 +1,5 @@
 import { css, html, LitElement } from 'lit';
-import { property, query } from 'lit/decorators.js';
+import { customElement, property, query } from 'lit/decorators.js';
 import { styleMap } from 'lit/directives/style-map.js';
 
 import {
@@ -33,9 +33,8 @@ import { lintKeymap } from '@codemirror/lint';
 import { oneDarkTheme } from '@codemirror/theme-one-dark';
 
 import isEqual from 'lodash-es/isEqual';
-import { ScopedElementsMixin } from '@open-wc/scoped-elements';
 
-import { RemoteCursor } from './remote-cursor';
+import './remote-cursor';
 
 const DummyAnnotation = Annotation.define();
 
@@ -44,7 +43,8 @@ export interface CodemirrorState {
   selection?: SelectionRange;
 }
 
-export class CodemirrorMarkdown extends ScopedElementsMixin(LitElement) {
+@customElement('codemirror-markdown')
+export class CodemirrorMarkdown extends LitElement {
   editor!: EditorView;
 
   @query('#editor')
@@ -227,7 +227,7 @@ export class CodemirrorMarkdown extends ScopedElementsMixin(LitElement) {
 
     if (!coords) return html``;
 
-    return html`<remote-cursor
+    return html`<codemirror-remote-cursor
       style=${styleMap({
         left: `${coords.left}px`,
         top: `${coords.top}px`,
@@ -235,7 +235,7 @@ export class CodemirrorMarkdown extends ScopedElementsMixin(LitElement) {
       class="cursor"
       .name=${c.name}
       .color=${c.color}
-    ></remote-cursor>`;
+    ></codemirror-remote-cursor>`;
   }
 
   render() {
@@ -251,10 +251,4 @@ export class CodemirrorMarkdown extends ScopedElementsMixin(LitElement) {
       position: fixed;
     }
   `;
-
-  static get scopedElements() {
-    return {
-      'remote-cursor': RemoteCursor,
-    };
-  }
 }

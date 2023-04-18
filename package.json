@@ -3,7 +3,7 @@
   "description": "Wrapper of codemirror using the @open-wc/scoped-elements pattern",
   "license": "MIT",
   "author": "guillem.cordoba@gmail.com",
-  "version": "0.0.4",
+  "version": "0.1.0",
   "main": "dist/index.js",
   "module": "dist/index.js",
   "exports": {
@@ -37,8 +37,7 @@
     "@codemirror/state": "^0.19.5",
     "@codemirror/theme-one-dark": "^0.19.1",
     "@codemirror/view": "^0.19.15",
-    "@open-wc/scoped-elements": "^2.0.1",
-    "@scoped-elements/shoelace": "0.0.8",
+    "@shoelace-style/shoelace": "^2.3.0",
     "lit": "^2.0.2",
     "lodash-es": "^4.17.21"
   },
@@ -61,18 +60,11 @@
   "customElements": "custom-elements.json",
   "eslintConfig": {
     "parser": "@typescript-eslint/parser",
-    "extends": [
-      "@open-wc",
-      "prettier"
-    ],
-    "plugins": [
-      "@typescript-eslint"
-    ],
+    "extends": ["@open-wc", "prettier"],
+    "plugins": ["@typescript-eslint"],
     "rules": {
       "no-unused-vars": "off",
-      "@typescript-eslint/no-unused-vars": [
-        "error"
-      ],
+      "@typescript-eslint/no-unused-vars": ["error"],
       "import/no-unresolved": "off",
       "import/extensions": "off",
       "max-classes-per-file": "off"
@@ -88,9 +80,6 @@
     }
   },
   "lint-staged": {
-    "*.ts": [
-      "eslint --fix",
-      "prettier --write"
-    ]
+    "*.ts": ["eslint --fix", "prettier --write"]
   }
 }

@@ -14,6 +14,7 @@
     "sourceMap": true,
     "inlineSources": true,
     "rootDir": "./src",
+    "skipLibCheck": true,
     "declaration": true,
     "incremental": true
   },
